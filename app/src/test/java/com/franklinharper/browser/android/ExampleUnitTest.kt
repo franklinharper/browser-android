@@ -1,4 +1,4 @@
-package com.franklinharper.focusguard.android
+package com.franklinharper.browser.android
 
 import org.junit.Test
 

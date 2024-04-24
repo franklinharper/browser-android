@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.franklinharper.focusguard.android"
+    namespace = "com.franklinharper.browser.android"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.franklinharper.focusguard.android"
+        applicationId = "com.franklinharper.browser.android"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

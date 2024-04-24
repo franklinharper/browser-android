@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Focus Guard"
+rootProject.name = "Browser"
 include(":app")
