@@ -1,6 +1,7 @@
 package com.franklinharper.focusguard.android
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebResourceRequest
@@ -28,15 +29,15 @@ class MainActivity : ComponentActivity() {
         Log.d(LOG_TAG, "onCreate url: $url")
 
         onBackPressedDispatcher.addCallback(owner = this) {
-                Log.d(LOG_TAG, "onBackPressed")
-                if (webView.canGoBack()) {
-                    Log.d(LOG_TAG, "webView.GoBack()")
-                    webView.goBack()
-                } else {
-                    Log.d(LOG_TAG, "finish Activity")
-                    finish()
-                }
+            Log.d(LOG_TAG, "onBackPressed")
+            if (webView.canGoBack()) {
+                Log.d(LOG_TAG, "webView.GoBack()")
+                webView.goBack()
+            } else {
+                Log.d(LOG_TAG, "finish Activity")
+                finish()
             }
+        }
         webView.loadUrl(url)
     }
 
@@ -65,18 +66,36 @@ class MainActivity : ComponentActivity() {
                 val isHttp = uri.scheme == "http"
                         || uri.scheme == "https"
                 Log.d(LOG_TAG, "isHttp: $isHttp")
-                val loadUrl = request.isForMainFrame && isHttp
-                if (loadUrl) {
-                    Log.d(LOG_TAG, "loadUrl: $uri")
-                    return false
-//                    view.loadUrl(uri.toString())
-//                    return true
-                } else {
-                    Log.d(LOG_TAG, "Start Activity: $uri")
-                    startActivity(Intent(Intent.ACTION_VIEW, uri))
-                    return true
-                }
+//                val loadUrl = request.isForMainFrame && isHttp
+                return when {
+                    isHttp -> {
+                        Log.d(LOG_TAG, "loadUrl: $uri")
+                        false
+                    }
 
+                    uri.host == "play.google.com" -> {
+                        Log.d(LOG_TAG, "Start Play Store: $uri")
+                        val id = uri.getQueryParameter("id")
+                        Log.d(LOG_TAG, "id: $id")
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            data = Uri.parse(
+                                "https://play.google.com/store/apps/details?id=$id"
+                            )
+                            setPackage("com.android.vending")
+                        }
+                        startActivity(intent)
+                        // The Play Store opens.
+                        // But seeing the Play Store **web** page in "Recents" feels weird.
+                        // Solution => go back to the previous web page.
+                        onBackPressedDispatcher.onBackPressed()
+                        return true
+                    }
+
+                    else -> {
+                        Log.d(LOG_TAG, "unknown uri: $uri")
+                        false
+                    }
+                }
             }
         }
     }
