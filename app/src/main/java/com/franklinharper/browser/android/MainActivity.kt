@@ -10,14 +10,16 @@ import android.view.MotionEvent
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
+import com.google.android.material.bottomsheet.BottomSheetDialog
 
 
 private const val LOG_TAG = "MainActivity"
 private const val SEARCH_URL = "https://www.google.com/"
-private const val aiUrl = "https://llama3.replicate.dev/"
+private const val AI_URL = "https://llama3.replicate.dev/"
 
 class MainActivity : ComponentActivity(),
     GestureDetector.OnGestureListener,
@@ -51,8 +53,6 @@ class MainActivity : ComponentActivity(),
                 super.onTouchEvent(event)
             }
         }
-        val url = intent?.dataString ?: SEARCH_URL
-        Log.d(LOG_TAG, "onCreate url: $url")
 
         onBackPressedDispatcher.addCallback(owner = this) {
             Log.d(LOG_TAG, "onBackPressed")
@@ -64,7 +64,13 @@ class MainActivity : ComponentActivity(),
                 finish()
             }
         }
-        webView.loadUrl(url)
+        val url = intent?.dataString
+        Log.d(LOG_TAG, "onCreate url: $url")
+        if (url == null) {
+            showBottomSheet()
+        } else {
+            webView.loadUrl(url)
+        }
     }
 
 //    override fun onNewIntent(intent: Intent?) {
@@ -118,7 +124,8 @@ class MainActivity : ComponentActivity(),
 
     override fun onDoubleTap(p0: MotionEvent): Boolean {
         Log.d(LOG_TAG, " onDoubleTap motionEvent: $p0")
-        return false
+        showBottomSheet()
+        return true
     }
 
     override fun onDoubleTapEvent(p0: MotionEvent): Boolean {
@@ -175,6 +182,7 @@ class MainActivity : ComponentActivity(),
                         onBackPressedDispatcher.onBackPressed()
                         true
                     }
+
                     else -> {
                         Log.d(LOG_TAG, "starting unknown uri: $uri")
                         val intent = Intent(Intent.ACTION_VIEW, uri)
@@ -195,4 +203,42 @@ class MainActivity : ComponentActivity(),
         }
     }
 
+    private fun showBottomSheet() {
+        val dialog = BottomSheetDialog(this)
+        dialog.setContentView(R.layout.bottom_sheet)
+        val aiButton = dialog.findViewById<Button>(R.id.aiButton)
+        aiButton!!.setOnClickListener {
+            webView.loadUrl(AI_URL)
+            dialog.dismiss()
+        }
+        val searchButton = dialog.findViewById<Button>(R.id.searchButton)
+        searchButton!!.setOnClickListener {
+            webView.loadUrl(SEARCH_URL)
+            dialog.dismiss()
+        }
+        val shareButton = dialog.findViewById<Button>(R.id.shareButton)
+        shareButton!!.setOnClickListener {
+            val title = getString(R.string.shareTitle, webView.title)
+            val shareIntent: Intent =
+                Intent().apply {
+                    action = Intent.ACTION_SEND
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_SUBJECT, title)
+                    putExtra(Intent.EXTRA_TEXT, webView.url)
+                }
+            startActivity(
+                Intent.createChooser(
+                    shareIntent,
+                    null
+                )
+            )
+            dialog.dismiss()
+        }
+        val exitButton = dialog.findViewById<Button>(R.id.exitButton)
+        exitButton!!.setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+        dialog.show()
+    }
 }

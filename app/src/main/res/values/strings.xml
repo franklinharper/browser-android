@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Frank\'s Browser</string>
     <string name="error">No app for %1$s</string>
+    <string name="exit">Exit</string>
+    <string name="share_link">Share link</string>
+    <string name="shareTitle">Check this out: %1$s</string>
+    <string name="search">Search</string>
+    <string name="AI">AI</string>
 </resources>
