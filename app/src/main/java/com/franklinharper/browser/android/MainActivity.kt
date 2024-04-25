@@ -1,12 +1,16 @@
 package com.franklinharper.browser.android
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 
@@ -15,16 +19,38 @@ private const val LOG_TAG = "MainActivity"
 private const val SEARCH_URL = "https://www.google.com/"
 private const val aiUrl = "https://llama3.replicate.dev/"
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(),
+    GestureDetector.OnGestureListener,
+    GestureDetector.OnDoubleTapListener {
 
     private lateinit var webView: WebView
+
+    private lateinit var gestureDetector: GestureDetector
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         Log.d(LOG_TAG, "onCreate")
         setContentView(R.layout.activity_main)
+
+        // Instantiate the gesture detector with the
+        // application context and an implementation of
+        // GestureDetector.OnGestureListener.
+        gestureDetector = GestureDetector(this, this).apply {
+            // Set the gesture detector as the double-tap
+            // listener.
+            setOnDoubleTapListener(this@MainActivity)
+        }
+
         webView = findViewById<WebView>(R.id.wv)
         initWebView()
+        webView.setOnTouchListener { view, event ->
+//            Log.d(LOG_TAG, "webView OnTouchListener")
+            if (gestureDetector.onTouchEvent(event)) {
+                false
+            } else {
+                super.onTouchEvent(event)
+            }
+        }
         val url = intent?.dataString ?: SEARCH_URL
         Log.d(LOG_TAG, "onCreate url: $url")
 
@@ -39,6 +65,65 @@ class MainActivity : ComponentActivity() {
             }
         }
         webView.loadUrl(url)
+    }
+
+//    override fun onNewIntent(intent: Intent?) {
+//        super.onNewIntent(intent)
+//        val url = intent?.dataString ?: SEARCH_URL
+//        Log.d(LOG_TAG, "onNewIntent url: $url")
+//        webView.loadUrl(url)
+//    }
+
+//    override fun onTouchEvent(event: MotionEvent): Boolean {
+//        Log.d(LOG_TAG, " onTouchEvent event: $event")
+//        return if (gestureDetector.onTouchEvent(event)) {
+//            true
+//        } else {
+//            super.onTouchEvent(event)
+//        }
+//    }
+
+    override fun onDown(motionEvent: MotionEvent): Boolean {
+        Log.d(LOG_TAG, " onDown motionEvent: $motionEvent")
+        return false
+    }
+
+    override fun onShowPress(p0: MotionEvent) {
+        Log.d(LOG_TAG, " onShowPress motionEvent: $p0")
+    }
+
+    override fun onSingleTapUp(p0: MotionEvent): Boolean {
+        Log.d(LOG_TAG, " onSingleTapUp motionEvent: $p0")
+        return false
+    }
+
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
+        Log.d(LOG_TAG, "onScroll")
+        return false
+    }
+
+    override fun onLongPress(p0: MotionEvent) {
+        Log.d(LOG_TAG, " onLongPress motionEvent: $p0")
+    }
+
+    override fun onFling(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
+        Log.d(LOG_TAG, " onFling motionEvent: $p0, $p1, $p2, $p3")
+        return false
+    }
+
+    override fun onSingleTapConfirmed(p0: MotionEvent): Boolean {
+        Log.d(LOG_TAG, " onSingleTapConfirmed motionEvent: $p0")
+        return false
+    }
+
+    override fun onDoubleTap(p0: MotionEvent): Boolean {
+        Log.d(LOG_TAG, " onDoubleTap motionEvent: $p0")
+        return false
+    }
+
+    override fun onDoubleTapEvent(p0: MotionEvent): Boolean {
+        Log.d(LOG_TAG, " onDoubleTapEvent motionEvent: $p0")
+        return false
     }
 
     private fun initWebView() {
@@ -86,25 +171,28 @@ class MainActivity : ComponentActivity() {
                         startActivity(intent)
                         // The Play Store opens.
                         // But seeing the Play Store **web** page in "Recents" feels weird.
-                        // Solution => go back to the previous web page.
+                        // Solution => go back to the previous web page when launching the Play Store.
                         onBackPressedDispatcher.onBackPressed()
-                        return true
+                        true
                     }
-
                     else -> {
-                        Log.d(LOG_TAG, "unknown uri: $uri")
-                        false
+                        Log.d(LOG_TAG, "starting unknown uri: $uri")
+                        val intent = Intent(Intent.ACTION_VIEW, uri)
+                        try {
+                            startActivity(intent);
+                        } catch (activityNotFoundException: ActivityNotFoundException) {
+                            Log.e(LOG_TAG, "ActivityNotFoundException for $uri")
+                            Toast.makeText(
+                                this@MainActivity,
+                                getString(R.string.error, uri),
+                                Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                        true
                     }
                 }
             }
         }
     }
-
-//    override fun onNewIntent(intent: Intent?) {
-//        super.onNewIntent(intent)
-//        val url = intent?.dataString ?: SEARCH_URL
-//        Log.d(LOG_TAG, "onNewIntent url: $url")
-//        webView.loadUrl(url)
-//    }
 
 }

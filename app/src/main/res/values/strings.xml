@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Frank\'s Browser</string>
+    <string name="error">No app for %1$s</string>
 </resources>

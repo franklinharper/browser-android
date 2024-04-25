@@ -1,17 +1,5 @@
 # Ideas
 
-## When redirected to a custom URL scheme then open that URL with the system
-
-Steps to reproduce
-
-1. Open https://www.speedtest.net/
-2. Click on Try the App.
-
-Expected: Play Store opens to the correct page
-Actual: ERR_UNKNOWN_URL_SCHEME
-
-## Run and test the app on iOS
-
 ## Add debug view that shows the WebView errors for the current page
 
 This will help with fixing bugs.
