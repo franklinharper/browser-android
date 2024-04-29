@@ -18,8 +18,37 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 
 
 private const val LOG_TAG = "MainActivity"
-private const val SEARCH_URL = "https://www.google.com/"
-private const val AI_URL = "https://llama3.replicate.dev/"
+
+sealed class ShortcutButton(
+    val siteName: String,
+    val url: String,
+    val id: Int,
+) {
+    data object PerplexityAi : ShortcutButton(
+        id = R.id.PerplexityAiButton,
+        siteName = "Perplexity AI",
+        url = "https://www.perplexity.ai/",
+    )
+
+    data object ChatGptAi : ShortcutButton(
+        id = R.id.ChatGptButton,
+        siteName = "ChatGpt",
+        url = "https://chat.openai.com/",
+    )
+
+    data object GoogleSearch : ShortcutButton(
+        id = R.id.GoogleSearchButton,
+        siteName = "Google",
+        url = "https://www.google.com/",
+    )
+
+    data object Llama3Ai : ShortcutButton(
+        id = R.id.Llama3Button,
+        siteName = "Llama 3",
+        url = "https://llama3.replicate.dev/",
+    )
+
+}
 
 class MainActivity : ComponentActivity(),
     GestureDetector.OnGestureListener,
@@ -206,39 +235,57 @@ class MainActivity : ComponentActivity(),
     private fun showBottomSheet() {
         val dialog = BottomSheetDialog(this)
         dialog.setContentView(R.layout.bottom_sheet)
-        val aiButton = dialog.findViewById<Button>(R.id.aiButton)
-        aiButton!!.setOnClickListener {
-            webView.loadUrl(AI_URL)
-            dialog.dismiss()
+        configureButton(dialog, ShortcutButton.PerplexityAi) { shortcutButton ->
+            webView.loadUrl(shortcutButton.url)
         }
-        val searchButton = dialog.findViewById<Button>(R.id.searchButton)
-        searchButton!!.setOnClickListener {
-            webView.loadUrl(SEARCH_URL)
-            dialog.dismiss()
+        configureButton(dialog, ShortcutButton.ChatGptAi) {shortcutButton ->
+            webView.loadUrl(shortcutButton.url)
         }
-        val shareButton = dialog.findViewById<Button>(R.id.shareButton)
-        shareButton!!.setOnClickListener {
-            val title = getString(R.string.shareTitle, webView.title)
-            val shareIntent: Intent =
-                Intent().apply {
-                    action = Intent.ACTION_SEND
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_SUBJECT, title)
-                    putExtra(Intent.EXTRA_TEXT, webView.url)
-                }
-            startActivity(
-                Intent.createChooser(
-                    shareIntent,
-                    null
+        configureButton(dialog, ShortcutButton.GoogleSearch) {shortcutButton ->
+            webView.loadUrl(shortcutButton.url)
+        }
+        configureButton(dialog, ShortcutButton.Llama3Ai) {shortcutButton ->
+            webView.loadUrl(shortcutButton.url)
+        }
+        dialog.findViewById<Button>(R.id.shareButton)!!.apply {
+            setOnClickListener {
+                val title = getString(R.string.shareTitle, webView.title)
+                val shareIntent: Intent =
+                    Intent().apply {
+                        action = Intent.ACTION_SEND
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_SUBJECT, title)
+                        putExtra(Intent.EXTRA_TEXT, webView.url)
+                    }
+                startActivity(
+                    Intent.createChooser(
+                        shareIntent,
+                        null
+                    )
                 )
-            )
-            dialog.dismiss()
+                dialog.dismiss()
+            }
         }
-        val exitButton = dialog.findViewById<Button>(R.id.exitButton)
-        exitButton!!.setOnClickListener {
-            dialog.dismiss()
-            finish()
+        dialog.findViewById<Button>(R.id.exitButton)!!.apply {
+            setOnClickListener {
+                dialog.dismiss()
+                finish()
+            }
         }
         dialog.show()
+    }
+
+    private fun configureButton(
+        dialog: BottomSheetDialog,
+        button: ShortcutButton,
+        onClick: (ShortcutButton) -> Unit,
+    ) {
+        dialog.findViewById<Button>(button.id)!!.apply {
+            text = button.siteName
+            setOnClickListener {
+                onClick(button)
+                dialog.dismiss()
+            }
+        }
     }
 }
