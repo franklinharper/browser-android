@@ -6,12 +6,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
+import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -49,9 +49,7 @@ sealed class ShortcutButton(
     )
 }
 
-class MainActivity : ComponentActivity(),
-    GestureDetector.OnGestureListener,
-    GestureDetector.OnDoubleTapListener {
+class MainActivity : ComponentActivity() {
 
     private lateinit var webView: WebView
 
@@ -64,14 +62,15 @@ class MainActivity : ComponentActivity(),
         Log.d(LOG_TAG, "onCreate")
         setContentView(R.layout.activity_main)
 
-        // Instantiate the gesture detector with the
-        // application context and an implementation of
-        // GestureDetector.OnGestureListener.
-        gestureDetector = GestureDetector(this, this).apply {
-            // Set the gesture detector as the double-tap
-            // listener.
-            setOnDoubleTapListener(this@MainActivity)
+        val gestureListener = object : SimpleOnGestureListener() {
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                Log.d(LOG_TAG, " onDoubleTap motionEvent: $e")
+                showBottomSheet()
+                return true
+            }
         }
+
+        gestureDetector = GestureDetector(this, gestureListener)
 
         webView = findViewById<WebView>(R.id.wv)
         initWebView()
@@ -109,59 +108,6 @@ class MainActivity : ComponentActivity(),
 //        Log.d(LOG_TAG, "onNewIntent url: $url")
 //        webView.loadUrl(url)
 //    }
-
-//    override fun onTouchEvent(event: MotionEvent): Boolean {
-//        Log.d(LOG_TAG, " onTouchEvent event: $event")
-//        return if (gestureDetector.onTouchEvent(event)) {
-//            true
-//        } else {
-//            super.onTouchEvent(event)
-//        }
-//    }
-
-    override fun onDown(motionEvent: MotionEvent): Boolean {
-        Log.d(LOG_TAG, " onDown motionEvent: $motionEvent")
-        return false
-    }
-
-    override fun onShowPress(p0: MotionEvent) {
-        Log.d(LOG_TAG, " onShowPress motionEvent: $p0")
-    }
-
-    override fun onSingleTapUp(p0: MotionEvent): Boolean {
-        Log.d(LOG_TAG, " onSingleTapUp motionEvent: $p0")
-        return false
-    }
-
-    override fun onScroll(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
-        Log.d(LOG_TAG, "onScroll")
-        return false
-    }
-
-    override fun onLongPress(p0: MotionEvent) {
-        Log.d(LOG_TAG, " onLongPress motionEvent: $p0")
-    }
-
-    override fun onFling(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
-        Log.d(LOG_TAG, " onFling motionEvent: $p0, $p1, $p2, $p3")
-        return false
-    }
-
-    override fun onSingleTapConfirmed(p0: MotionEvent): Boolean {
-        Log.d(LOG_TAG, " onSingleTapConfirmed motionEvent: $p0")
-        return false
-    }
-
-    override fun onDoubleTap(p0: MotionEvent): Boolean {
-        Log.d(LOG_TAG, " onDoubleTap motionEvent: $p0")
-        showBottomSheet()
-        return true
-    }
-
-    override fun onDoubleTapEvent(p0: MotionEvent): Boolean {
-        Log.d(LOG_TAG, " onDoubleTapEvent motionEvent: $p0")
-        return false
-    }
 
     private fun initWebView() {
         with(webView.settings) {
@@ -233,20 +179,6 @@ class MainActivity : ComponentActivity(),
             }
         }
     }
-
-//                            Log.e(LOG_TAG, "ActivityNotFoundException for $storeIntent")
-//                            Toast.makeText(
-//                                /* context = */ this@MainActivity,
-//                                /* text = */ getString(R.string.error, uri),
-//                                /* duration = */ Toast.LENGTH_SHORT,
-//                            ).show();
-//                        }
-//                        true
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     private fun showBottomSheet() {
         val dialog = BottomSheetDialog(this)
