@@ -4,7 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
 >
 
+    <!-- Declare the hardware used by the app -->
+    <!-- For details see https://developer.android.com/guide/topics/manifest/uses-feature-element -->
+    <!-- Camera -->
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <!-- Audio hardware usage -->
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+    <uses-feature android:name="android.hardware.audio.output" android:required="false" />
+    <!-- Location -->
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:allowBackup="true"

@@ -28,6 +28,12 @@
         android:text="@string/AI"
         />
     <Button
+        android:id="@+id/LinkedInButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/AI"
+        />
+    <Button
         android:id="@+id/shareButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
