@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -31,6 +32,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 private const val LOG_TAG = "MainActivity"
 private const val REQUEST_PERMISSION = 1
 private const val FILE_CHOOSER_RESULT_CODE = 2
+private const val YOUTUBE_URL_PREFIX = "https://m.youtube.com/watch"
 
 sealed class ShortcutButton(
     val siteName: String,
@@ -66,6 +68,7 @@ sealed class ShortcutButton(
         siteName = "LInkedIn Messaging",
         url = "https://www.linkedin.com/messaging",
     )
+
     data object ProductivitySubReddit : ShortcutButton(
         id = R.id.RedditButton,
         siteName = "Productivity SubReddit",
@@ -75,9 +78,11 @@ sealed class ShortcutButton(
 
 class MainActivity : ComponentActivity() {
 
+    private var receivedFullscreenView: View? = null
+    private var previousSystemUiVisibility: Int? = null
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private lateinit var webView: WebView
-    private lateinit var customViewContainer: FrameLayout
+    private lateinit var fullscreenContainer: FrameLayout
 
     private lateinit var gestureDetector: GestureDetector
 
@@ -88,8 +93,9 @@ class MainActivity : ComponentActivity() {
         Log.d(LOG_TAG, "onCreate")
         setContentView(R.layout.activity_main)
         webView = findViewById(R.id.wv)
-        customViewContainer = findViewById(R.id.customViewContainer)
-        customViewContainer.visibility = View.GONE
+        fullscreenContainer = findViewById<FrameLayout?>(R.id.fullscreenContainer).apply {
+            visibility = View.GONE
+        }
 
         val gestureListener = object : SimpleOnGestureListener() {
             override fun onDoubleTap(e: MotionEvent): Boolean {
@@ -140,12 +146,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Inform the user of how to exit fullscreen mode.
+        if (receivedFullscreenView != null) {
+           showExitFullScreenToast()
+        }
+    }
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
         data: Intent?,
     ) {
-        Log.d(LOG_TAG, "onActivityResult requestCode:$requestCode, resultCode:$resultCode, data:$data")
+        Log.d(
+            LOG_TAG,
+            "onActivityResult requestCode:$requestCode, resultCode:$resultCode, data:$data"
+        )
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == FILE_CHOOSER_RESULT_CODE) {
             if (null == filePathCallback) return
@@ -217,20 +233,58 @@ class MainActivity : ComponentActivity() {
 
             // onShowCustomView should be called when the webpage requests full screen mode.
             // https://developer.android.com/reference/android/webkit/WebChromeClient#onShowCustomView(android.view.View,%20android.webkit.WebChromeClient.CustomViewCallback)
-            override fun onShowCustomView(view: View, callback: CustomViewCallback) {
-                // TODO test and debug this code
+            override fun onShowCustomView(
+                view: View?,
+                callback: CustomViewCallback,
+            ) {
                 Log.d(LOG_TAG, "onShowCustomView view: $view, callback: $callback")
+
+                // Hide the normal UI
+                // Inspired by https://github.com/gsantner/markor/blob/master/app/src/main/java/net/gsantner/opoc/web/GsWebViewChromeClient.java
                 webView.visibility = View.GONE
-                customViewContainer.addView(view)
+                val decorView = window.decorView
+                previousSystemUiVisibility = decorView.systemUiVisibility
+                decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            or View.SYSTEM_UI_FLAG_FULLSCREEN
+                )
+
+                // Add WebView's full screen view to layout.
+                fullscreenContainer.addView(view)
+                fullscreenContainer.visibility = View.VISIBLE
+
+                // I don't know why Brave and Chrome switch to landscape when
+                // playing YouTube fullscreen video.
+                // For the time being this hack is a workaround
+                if (webView.url?.startsWith(YOUTUBE_URL_PREFIX) == true) {
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                }
+
+                showExitFullScreenToast()
+
                 customViewCallback = callback
-                customViewContainer.visibility = View.GONE
+                receivedFullscreenView = view
             }
 
             override fun onHideCustomView() {
+                super.onHideCustomView()
                 Log.d(LOG_TAG, "onHideCustomView")
+
+                // Remove/hide WebView fullscreen UI
+                fullscreenContainer.removeView(receivedFullscreenView)
+                fullscreenContainer.visibility = View.GONE
+                receivedFullscreenView = null
+
+                // Show normal UI
+
+                window.decorView.systemUiVisibility = previousSystemUiVisibility!!
                 webView.visibility = View.VISIBLE
-                customViewContainer.visibility = View.GONE
                 customViewCallback?.onCustomViewHidden()
+                // Hack! See comments above in onShowCustomView()
+                if (webView.url?.startsWith(YOUTUBE_URL_PREFIX) == true) {
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                }
             }
 
             // The WebView tell the app to show a file chooser.
@@ -353,6 +407,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun showExitFullScreenToast() {
+        Toast.makeText(
+            /* context = */ this@MainActivity,
+            /* text = */ "Drag from top and touch the back button to exit full screen",
+            /* duration = */ Toast.LENGTH_LONG
+        ).show()
     }
 
     private fun showBottomSheet() {
