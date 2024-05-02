@@ -63,9 +63,13 @@ sealed class ShortcutButton(
 
     data object LinkedIn : ShortcutButton(
         id = R.id.LinkedInButton,
-        siteName = "LInkedIn",
+        siteName = "LInkedIn Messaging",
         url = "https://www.linkedin.com/messaging",
-//        url = "https://www.linkedin.com/mwlite/messaging/thread/2-ZTNjYzUwMzQtY2M4My00MmU2LTgzMzUtNzY1YTJhNDc3YThmXzAxMA==",
+    )
+    data object ProductivitySubReddit : ShortcutButton(
+        id = R.id.RedditButton,
+        siteName = "Productivity SubReddit",
+        url = "https://www.reddit.com/r/productivity/",
     )
 }
 
@@ -367,6 +371,9 @@ class MainActivity : ComponentActivity() {
             webView.loadUrl(shortcutButton.url)
         }
         configureButton(dialog, ShortcutButton.LinkedIn) { shortcutButton ->
+            webView.loadUrl(shortcutButton.url)
+        }
+        configureButton(dialog, ShortcutButton.ProductivitySubReddit) { shortcutButton ->
             webView.loadUrl(shortcutButton.url)
         }
         dialog.findViewById<Button>(R.id.shareButton)!!.apply {
