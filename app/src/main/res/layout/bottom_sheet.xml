@@ -2,53 +2,70 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center"
+    android:layout_margin="16dp"
     android:orientation="vertical">
     <Button
-        android:id="@+id/PerplexityAiButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/search"
-        />
-    <Button
         android:id="@+id/ChatGptButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/search"
+        android:drawableStart="@drawable/chatgpt"
+        android:drawablePadding="8dp"
         />
     <Button
         android:id="@+id/GoogleSearchButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/search"
+        android:drawableStart="@drawable/google"
+        android:drawablePadding="8dp"
+        />
+    <Button
+        android:id="@+id/PerplexityAiButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <Button
+        android:id="@+id/ClaudeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/claude_icon"
+        android:drawablePadding="8dp"
         />
     <Button
         android:id="@+id/Llama3Button"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/AI"
         />
     <Button
         android:id="@+id/LinkedInButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/AI"
+        android:drawableStart="@drawable/linkedin_icon"
+        android:drawablePadding="8dp"
         />
     <Button
         android:id="@+id/RedditButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/AI"
         />
     <Button
         android:id="@+id/shareButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:drawableStart="@android:drawable/ic_menu_share"
+        android:drawablePadding="8dp"
         android:text="@string/share_link"
         />
     <Button
         android:id="@+id/exitButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/exit"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:text="@string/appVersion"
         />
 </LinearLayout>

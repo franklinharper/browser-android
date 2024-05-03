@@ -6,4 +6,5 @@
     <string name="shareTitle">Check this out: %1$s</string>
     <string name="search">Search</string>
     <string name="AI">AI</string>
+    <string name="appVersion">Version 0.1.0</string>
 </resources>

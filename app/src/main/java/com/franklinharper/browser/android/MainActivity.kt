@@ -39,16 +39,22 @@ sealed class ShortcutButton(
     val url: String,
     val id: Int,
 ) {
-    data object PerplexityAi : ShortcutButton(
-        id = R.id.PerplexityAiButton,
-        siteName = "Perplexity AI",
-        url = "https://www.perplexity.ai/",
-    )
-
     data object ChatGptAi : ShortcutButton(
         id = R.id.ChatGptButton,
         siteName = "ChatGpt",
         url = "https://chat.openai.com/",
+    )
+
+    data object ClaudeAi : ShortcutButton(
+        id = R.id.ClaudeButton,
+        siteName = "Claude AI",
+        url = "https://claude.ai/chats",
+    )
+
+    data object PerplexityAi : ShortcutButton(
+        id = R.id.PerplexityAiButton,
+        siteName = "Perplexity AI",
+        url = "https://www.perplexity.ai/",
     )
 
     data object GoogleSearch : ShortcutButton(
@@ -426,6 +432,9 @@ class MainActivity : ComponentActivity() {
         configureButton(dialog, ShortcutButton.ChatGptAi) { shortcutButton ->
             webView.loadUrl(shortcutButton.url)
         }
+        configureButton(dialog, ShortcutButton.ClaudeAi) { shortcutButton ->
+            webView.loadUrl(shortcutButton.url)
+        }
         configureButton(dialog, ShortcutButton.GoogleSearch) { shortcutButton ->
             webView.loadUrl(shortcutButton.url)
         }
@@ -438,8 +447,13 @@ class MainActivity : ComponentActivity() {
         configureButton(dialog, ShortcutButton.ProductivitySubReddit) { shortcutButton ->
             webView.loadUrl(shortcutButton.url)
         }
-        dialog.findViewById<Button>(R.id.shareButton)!!.apply {
-            setOnClickListener {
+
+        val shareButton = dialog.findViewById<Button>(R.id.shareButton)!!
+        if (webView.url.isNullOrBlank()) {
+            shareButton.visibility = View.GONE
+        } else {
+            shareButton.visibility = View.VISIBLE
+            shareButton.setOnClickListener {
                 val title = getString(R.string.shareTitle, webView.title)
                 val shareIntent: Intent =
                     Intent().apply {
@@ -457,6 +471,7 @@ class MainActivity : ComponentActivity() {
                 dialog.dismiss()
             }
         }
+
         dialog.findViewById<Button>(R.id.exitButton)!!.apply {
             setOnClickListener {
                 dialog.dismiss()
