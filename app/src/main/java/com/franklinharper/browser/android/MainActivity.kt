@@ -152,8 +152,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        webView.pauseTimers()
+    }
+
     override fun onResume() {
         super.onResume()
+        webView.resumeTimers()
         // Inform the user of how to exit fullscreen mode.
         if (receivedFullscreenView != null) {
            showExitFullScreenToast()
