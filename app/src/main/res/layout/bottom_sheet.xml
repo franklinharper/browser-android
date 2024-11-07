@@ -6,13 +6,6 @@
     android:layout_margin="16dp"
     android:orientation="vertical">
     <Button
-        android:id="@+id/ChatGptButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableStart="@drawable/chatgpt"
-        android:drawablePadding="8dp"
-        />
-    <Button
         android:id="@+id/GoogleSearchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -20,33 +13,11 @@
         android:drawablePadding="8dp"
         />
     <Button
-        android:id="@+id/PerplexityAiButton"
+        android:id="@+id/archiveTodayButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
-    <Button
-        android:id="@+id/ClaudeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableStart="@drawable/claude_icon"
+        android:drawableStart="@drawable/eye"
         android:drawablePadding="8dp"
-        />
-    <Button
-        android:id="@+id/Llama3Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-    <Button
-        android:id="@+id/LinkedInButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableStart="@drawable/linkedin_icon"
-        android:drawablePadding="8dp"
-        />
-    <Button
-        android:id="@+id/RedditButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         />
     <Button
         android:id="@+id/shareButton"

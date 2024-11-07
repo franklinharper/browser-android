@@ -39,46 +39,15 @@ sealed class ShortcutButton(
     val url: String,
     val id: Int,
 ) {
-    data object ChatGptAi : ShortcutButton(
-        id = R.id.ChatGptButton,
-        siteName = "ChatGpt",
-        url = "https://chat.openai.com/",
-    )
-
-    data object ClaudeAi : ShortcutButton(
-        id = R.id.ClaudeButton,
-        siteName = "Claude AI",
-        url = "https://claude.ai/chats",
-    )
-
-    data object PerplexityAi : ShortcutButton(
-        id = R.id.PerplexityAiButton,
-        siteName = "Perplexity AI",
-        url = "https://www.perplexity.ai/",
-    )
-
     data object GoogleSearch : ShortcutButton(
         id = R.id.GoogleSearchButton,
         siteName = "Google",
         url = "https://www.google.com/",
     )
-
-    data object Llama3Ai : ShortcutButton(
-        id = R.id.Llama3Button,
-        siteName = "Llama 3",
-        url = "https://llama3.replicate.dev/",
-    )
-
-    data object LinkedIn : ShortcutButton(
-        id = R.id.LinkedInButton,
-        siteName = "LInkedIn Messaging",
-        url = "https://www.linkedin.com/messaging",
-    )
-
-    data object ProductivitySubReddit : ShortcutButton(
-        id = R.id.RedditButton,
-        siteName = "Productivity SubReddit",
-        url = "https://www.reddit.com/r/productivity/",
+    data object ArchiveTodayButton : ShortcutButton(
+        id = R.id.archiveTodayButton,
+        siteName = "Archive Today",
+        url = "https://archive.ph/",
     )
 }
 
@@ -225,7 +194,11 @@ class MainActivity : ComponentActivity() {
             javaScriptCanOpenWindowsAutomatically = true
             safeBrowsingEnabled = false
             mediaPlaybackRequiresUserGesture = false
-            setSupportZoom(true)
+
+            // Enable pinch-to-zoom
+            builtInZoomControls = true
+            displayZoomControls = false
+
             allowFileAccess = true
             allowContentAccess = true
             loadWithOverviewMode = false
@@ -430,52 +403,40 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showBottomSheet() {
-        val dialog = BottomSheetDialog(this)
+        val dialog = BottomSheetDialog(/* context = */ this)
         dialog.setContentView(R.layout.bottom_sheet)
-        configureButton(dialog, ShortcutButton.PerplexityAi) { shortcutButton ->
-            webView.loadUrl(shortcutButton.url)
-        }
-        configureButton(dialog, ShortcutButton.ChatGptAi) { shortcutButton ->
-            webView.loadUrl(shortcutButton.url)
-        }
-        configureButton(dialog, ShortcutButton.ClaudeAi) { shortcutButton ->
-            webView.loadUrl(shortcutButton.url)
-        }
         configureButton(dialog, ShortcutButton.GoogleSearch) { shortcutButton ->
             webView.loadUrl(shortcutButton.url)
         }
-        configureButton(dialog, ShortcutButton.Llama3Ai) { shortcutButton ->
-            webView.loadUrl(shortcutButton.url)
-        }
-        configureButton(dialog, ShortcutButton.LinkedIn) { shortcutButton ->
-            webView.loadUrl(shortcutButton.url)
-        }
-        configureButton(dialog, ShortcutButton.ProductivitySubReddit) { shortcutButton ->
-            webView.loadUrl(shortcutButton.url)
+        configureButton(dialog, ShortcutButton.ArchiveTodayButton) { shortcutButton ->
+            webView.loadUrl(shortcutButton.url + webView.url)
         }
 
         val shareButton = dialog.findViewById<Button>(R.id.shareButton)!!
-        if (webView.url.isNullOrBlank()) {
-            shareButton.visibility = View.GONE
-        } else {
-            shareButton.visibility = View.VISIBLE
-            shareButton.setOnClickListener {
-                val title = getString(R.string.shareTitle, webView.title)
-                val shareIntent: Intent =
-                    Intent().apply {
-                        action = Intent.ACTION_SEND
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_SUBJECT, title)
-                        putExtra(Intent.EXTRA_TEXT, webView.url)
-                    }
-                startActivity(
-                    Intent.createChooser(
-                        shareIntent,
-                        null
-                    )
+        val archiveTodayButton = dialog.findViewById<Button>(R.id.archiveTodayButton)!!
+        shareButton.setOnClickListener {
+            val title = getString(R.string.shareTitle, webView.title)
+            val shareIntent: Intent =
+                Intent().apply {
+                    action = Intent.ACTION_SEND
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_SUBJECT, title)
+                    putExtra(Intent.EXTRA_TEXT, webView.url)
+                }
+            startActivity(
+                Intent.createChooser(
+                    shareIntent,
+                    null
                 )
-                dialog.dismiss()
-            }
+            )
+            dialog.dismiss()
+        }
+        if (webView.url.isNullOrBlank()) {
+            shareButton.isEnabled = false
+            archiveTodayButton.isEnabled = false
+        } else {
+            shareButton.isEnabled = true
+            archiveTodayButton.isEnabled = true
         }
 
         dialog.findViewById<Button>(R.id.exitButton)!!.apply {

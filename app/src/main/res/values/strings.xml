@@ -1,10 +1,7 @@
 <resources>
     <string name="app_name">Concentra Browser</string>
-    <string name="error">No app for %1$s</string>
     <string name="exit">Exit</string>
     <string name="share_link">Share link</string>
     <string name="shareTitle">Check this out: %1$s</string>
-    <string name="search">Search</string>
-    <string name="AI">AI</string>
-    <string name="appVersion">Version 0.1.1</string>
+    <string name="appVersion">Version 0.1.2</string>
 </resources>
