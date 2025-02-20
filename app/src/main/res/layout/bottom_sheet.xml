@@ -40,10 +40,12 @@
         android:layout_height="wrap_content"
         android:text="@string/exit"
         />
+<!-- The versionName value is set programmatically -->
     <TextView
+        android:id="@+id/versionName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="@string/appVersion"
+        android:text=""
         />
 </LinearLayout>

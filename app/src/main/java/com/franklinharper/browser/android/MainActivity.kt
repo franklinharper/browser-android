@@ -23,6 +23,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
@@ -451,6 +452,9 @@ class MainActivity : ComponentActivity() {
                 dialog.dismiss()
                 finish()
             }
+        }
+        dialog.findViewById<TextView>(R.id.versionName)!!.apply {
+            text = getString(R.string.appVersion, BuildConfig.VERSION_NAME)
         }
         dialog.show()
     }
