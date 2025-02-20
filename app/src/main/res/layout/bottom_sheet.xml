@@ -13,6 +13,13 @@
         android:drawablePadding="8dp"
         />
     <Button
+        android:id="@+id/WikipediaSearchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/wikipedia_w"
+        android:drawablePadding="8dp"
+        />
+    <Button
         android:id="@+id/archiveTodayButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

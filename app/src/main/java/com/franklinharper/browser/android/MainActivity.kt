@@ -44,6 +44,11 @@ sealed class ShortcutButton(
         siteName = "Google",
         url = "https://www.google.com/",
     )
+    data object WikipediaSearch : ShortcutButton(
+        id = R.id.WikipediaSearchButton,
+        siteName = "Wikipedia",
+        url = "https://www.wikipedia.org/",
+    )
     data object ArchiveTodayButton : ShortcutButton(
         id = R.id.archiveTodayButton,
         siteName = "Archive Today",
@@ -405,6 +410,9 @@ class MainActivity : ComponentActivity() {
         val dialog = BottomSheetDialog(/* context = */ this)
         dialog.setContentView(R.layout.bottom_sheet)
         configureButton(dialog, ShortcutButton.GoogleSearch) { shortcutButton ->
+            webView.loadUrl(shortcutButton.url)
+        }
+        configureButton(dialog, ShortcutButton.WikipediaSearch) { shortcutButton ->
             webView.loadUrl(shortcutButton.url)
         }
         configureButton(dialog, ShortcutButton.ArchiveTodayButton) { shortcutButton ->
