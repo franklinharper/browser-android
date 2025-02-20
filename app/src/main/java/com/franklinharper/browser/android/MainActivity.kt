@@ -192,7 +192,6 @@ class MainActivity : ComponentActivity() {
             javaScriptEnabled = true
             domStorageEnabled = true
             javaScriptCanOpenWindowsAutomatically = true
-            safeBrowsingEnabled = false
             mediaPlaybackRequiresUserGesture = false
 
             // Enable pinch-to-zoom
