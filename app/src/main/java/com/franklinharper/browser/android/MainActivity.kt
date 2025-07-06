@@ -355,8 +355,16 @@ class MainActivity : ComponentActivity() {
                 val isHttp = uri.scheme == "http"
                         || uri.scheme == "https"
                 Log.d(LOG_TAG, "isHttp: $isHttp")
+
+                val host = uri.host ?: ""
+                val isTwitter = host.contains("twitter") || host.contains("x.com")
 //                val loadUrl = request.isForMainFrame && isHttp
                 return when {
+                    isTwitter -> {
+                        Log.d(LOG_TAG, "blocking Twitter")
+                        view.loadUrl("https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyY2VseDh3NmkyZ3kyN3lya3JoYXNsZGh4eWwwYWN6eXRxY2x6c3pvdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wW95fEq09hOI8/giphy.gif")
+                        true
+                    }
                     isHttp -> {
                         Log.d(LOG_TAG, "loadUrl: $uri")
                         false
