@@ -1,7 +1,6 @@
 package com.franklinharper.browser.android
 
 import android.Manifest
-import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -32,8 +31,20 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 private const val LOG_TAG = "MainActivity"
 private const val REQUEST_PERMISSION = 1
 private const val FILE_CHOOSER_RESULT_CODE = 2
-private const val YOUTUBE_URL_PREFIX = "https://m.youtube.com/watch"
 
+private fun expandHostName(hostName: String) = listOf(hostName, "www.$hostName")
+
+private val HOST_BLACK_LIST: List<String> = listOf(
+    expandHostName("twitter.com"),
+    expandHostName("x.com"),
+    expandHostName("youtube.com"),
+    expandHostName("m.youtube.com"),
+    expandHostName("linkedin.com"),
+    expandHostName("feedly.com"),
+).flatten()
+
+// Not currently used because Youtube is on the blacklist
+private const val YOUTUBE_URL_PREFIX = "https://m.youtube.com/watch"
 sealed class ShortcutButton(
     val siteName: String,
     val url: String,
@@ -146,7 +157,7 @@ class MainActivity : ComponentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == FILE_CHOOSER_RESULT_CODE) {
             if (null == filePathCallback) return
-            val result = if (data == null || resultCode != Activity.RESULT_OK) null else data.data
+            val result = if (data == null || resultCode != RESULT_OK) null else data.data
             if (result != null) {
                 filePathCallback?.onReceiveValue(arrayOf(result))
             } else {
@@ -214,7 +225,7 @@ class MainActivity : ComponentActivity() {
             }
 
 
-            var customViewCallback: WebChromeClient.CustomViewCallback? = null
+            var customViewCallback: CustomViewCallback? = null
 
             // onShowCustomView should be called when the webpage requests full screen mode.
             // https://developer.android.com/reference/android/webkit/WebChromeClient#onShowCustomView(android.view.View,%20android.webkit.WebChromeClient.CustomViewCallback)
@@ -356,12 +367,11 @@ class MainActivity : ComponentActivity() {
                         || uri.scheme == "https"
                 Log.d(LOG_TAG, "isHttp: $isHttp")
 
-                val host = uri.host ?: ""
-                val isTwitter = host.contains("twitter") || host.contains("x.com")
+                val host = uri.host?.lowercase() ?: ""
 //                val loadUrl = request.isForMainFrame && isHttp
                 return when {
-                    isTwitter -> {
-                        Log.d(LOG_TAG, "blocking Twitter")
+                    host in HOST_BLACK_LIST -> {
+                        Log.d(LOG_TAG, "blocking $host")
                         view.loadUrl("https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyY2VseDh3NmkyZ3kyN3lya3JoYXNsZGh4eWwwYWN6eXRxY2x6c3pvdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wW95fEq09hOI8/giphy.gif")
                         true
                     }
@@ -375,14 +385,14 @@ class MainActivity : ComponentActivity() {
                             /* uri = */ request.url.toString(),
                             /* flags = */ Intent.URI_INTENT_SCHEME
                         )
-                        Log.d(LOG_TAG, "starting Intent: $intent")
+                        Log.d(LOG_TAG, "start Intent: $intent")
                         try {
                             startActivity(intent);
                             true
                         } catch (activityNotFoundException: ActivityNotFoundException) {
-                            Log.d(LOG_TAG, "Start Play Store")
+                            Log.d(LOG_TAG, "Start activity failed: $activityNotFoundException")
                             val appPackage = intent.`package`
-                            Log.d(LOG_TAG, "id: $appPackage")
+                            Log.d(LOG_TAG, "appPackage from intent: $appPackage")
                             val storeIntent = Intent(Intent.ACTION_VIEW).apply {
                                 data = Uri.parse(
                                     "https://play.google.com/store/apps/details?id=$appPackage"

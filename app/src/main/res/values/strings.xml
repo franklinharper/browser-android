@@ -3,5 +3,5 @@
     <string name="exit">Exit</string>
     <string name="share_link">Share link</string>
     <string name="shareTitle">Check this out: %1$s</string>
-    <string name="appVersion">Version 0.1.3</string>
+    <string name="appVersion">Version 0.1.5</string>
 </resources>
